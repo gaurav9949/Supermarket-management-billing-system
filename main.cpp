@@ -114,7 +114,7 @@ m:
 }
 void shopping ::buyer()
 {
-m:
+
     int choice;
     cout << "\n\n\t\t Buyer";
     cout << "______________\n";
@@ -134,7 +134,7 @@ m:
     default:
         cout << "Please enter a valid option";
     }
-    goto m;
+   
 }
 void shopping ::add()
 {
@@ -295,60 +295,76 @@ void shopping ::list()
     }
     data.close();
 }
-void shopping ::receipt()
-{
+void shopping::receipt() {
     fstream data;
-    int arrc[100];
-    int arrq[100];
-    char choice;
-    int c = 0;
-    float amount = 0;
-    float dis = 0;
-    float total = 0;
+    int arrc[100];  // Array to store product codes
+    int arrq[100];  // Array to store quantities
+    char choice;    // Variable to store user choice for purchasing more items
+    int c = 0;      // Counter for items
+    float amount = 0, discount = 0, total = 0;
+
     cout << "\n\n\t\t\t\t RECEIPT";
-    data.open("database,txt", ios::in);
-    if (!data)
-    {
+    data.open("database.txt", ios::in);  // Corrected file name
+    if (!data) {
         cout << "\n\n Empty database";
-    }
-    else
-    {
+    } else {
         data.close();
-        list();
-        cout << "n__________________________________________\n";
-        cout << "n|                                         \n";
-        cout << "n PLEASE PLACE THE ORDER\n";
-        cout << "n|                                         \n";
-        cout << "n__________________________________________\n";
-        do
-        {
-            cout << "\n\n Enter the product code :";
+        list();  // Display available products
+        cout << "\n__________________________________________\n";
+        cout << "PLEASE PLACE YOUR ORDER\n";
+        cout << "__________________________________________\n";
+
+        do {
+            cout << "\n\n Enter the product code: ";
             cin >> arrc[c];
-            cout << "\n\nEnter the product quantity:";
+            cout << "Enter the product quantity: ";
             cin >> arrq[c];
-            for (int i = 0; i < c; i++)
-            {
-                if (arrc[c] == arrc[i])
-                {
-                    cout << "\n\n Duplicate product code.Please try again!";
-                    goto m;
+
+            bool duplicate = false;
+            for (int i = 0; i < c; i++) {
+                if (arrc[c] == arrc[i]) {
+                    cout << "\n\n Duplicate product code. Please try again.\n";
+                    duplicate = true;  // Flag duplicate code
+                    break;
                 }
             }
-            c++;
-            cout << "\n\n Do you want to buy another product? If yes then press y else no";
-        } while (choice == "y");
+
+            if (!duplicate) {
+                c++;  // Only increment if no duplicate was found
+            }
+
+            cout << "\n\n Do you want to buy another product? (y/n): ";
+            cin >> choice;
+        } while (choice == 'y');  // Continue while user wants to buy more products
+
         cout << "\n\n\t\t _______________________Receipt_____________\n";
-        cout << "\n Product No\t product Name\t Product quantity\t pricr \t Amount \t Amount with discount ";
-        for (int i = 0; i < c; i++)
-        {
+        cout << "\nProduct No\tProduct Name\tQuantity\tPrice\tAmount\tAmount with Discount\n";
+
+        for (int i = 0; i < c; i++) {
             data.open("database.txt", ios::in);
             data >> pcode >> pname >> price >> dis;
-            while (!data.eof())
-            {
-                if (pcode == arrc[i])
-                {
+            while (!data.eof()) {
+                if (pcode == arrc[i]) {
+                    amount = price * arrq[i];            // Calculate total amount
+                    discount = amount - (amount * dis / 100);  // Apply discount
+                    total += discount;
+
+                    // Display product details
+                    cout << pcode << "\t\t" << pname << "\t\t" << arrq[i] << "\t\t"
+                         << price << "\t" << amount << "\t\t" << discount << "\n";
                 }
+                data >> pcode >> pname >> price >> dis;
             }
+            data.close();
         }
+
+        cout << "\n\n____________________________________";
+        cout << "\n Total Amount: " << total << "\n";
     }
+}
+
+
+int main(){
+    shopping s;
+    s.menu();
 }
